@@ -18,6 +18,7 @@ fi
 
 echo "Uploading local datasets to GCS..."
 mkdir -p data # ensure it exists
+echo "Uploading golden evaluation dataset audio clips (*.wav) and mapping tables if they exist locally..."
 gcloud storage cp -r data/ gs://$BUCKET/data/ || echo "Upload finished or skipped"
 
 echo "Bootstrapping GCP APIs and IAM roles..."

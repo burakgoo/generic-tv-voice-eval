@@ -1,0 +1,11 @@
+audio_file,expected_intent,spoken_phrase
+data/sample_0.wav,Switch to Channel 1,Switch to Channel 1
+data/sample_1.wav,Open Netflix,Put on Netflix
+data/sample_2.wav,Volume Up,Make it much louder
+data/sample_3.wav,Mute the TV,Mute this completely
+data/sample_4.wav,Search for Action Movies,Show me some action movies
+data/sample_5.wav,Turn off TV,Turn off the screen now please
+data/sample_6.wav,Play next episode,Play the next episode
+data/sample_7.wav,Pause the movie,Pause the video
+data/sample_8.wav,Launch YouTube,Open up YouTube
+data/sample_9.wav,Play,Can you resume playback?

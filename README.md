@@ -1,3 +1,5 @@
+> **Notice**: This repository houses a generically modeled LLM evaluation framework for TV Intent generation. The core logic, infrastructure pipelines, and architectural footprint have been rigorously generalized and scrubbed from an initial, highly-customized implementation originally constructed for a Tier-1 Telecommunications company.
+
 # Generic TV Voice Evaluation Framework
 
 This repository provides a reproducible, cloud-native evaluation framework for assessing the performance of TV voice assistants. It is designed to be easily cloneable and deployable by Customer Engineers (CEs).
