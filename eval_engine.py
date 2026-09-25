@@ -64,7 +64,13 @@ class EvaluationEngine:
             raise ValueError("Model not initialized")
             
         logger.info(f"Classifying intent for transcript: {transcript}")
-        prompt = f"Given the user said '{transcript}', what is their exact TV command intent? Answer with a single concise phrase (e.g. 'Switch to Channel 1', 'Volume Up')."
+        valid_intents = [
+            "Switch to Channel 1", "Volume Up", "Mute the TV", 
+            "Turn off TV", "Pause the movie", "Launch YouTube", 
+            "Play", "Open Netflix", "Play next episode", 
+            "Search for Action Movies"
+        ]
+        prompt = f"Given the user heard '{transcript}', map this exactly to one of the following valid intents: {valid_intents}. Output ONLY the exact valid intent string with no other punctuation or words. If it matches none, output 'None'." 
         response = self.model.generate_content(prompt)
         logger.info(f"Determined intent: {response.text.strip()}")
         return response.text.strip()
