@@ -87,9 +87,11 @@ class EvaluationEngine:
             logger.warning("Skipping BQ write (Client missing).")
             return
             
+        import datetime
         table_id = f"{self.project_id}.{self.bq_dataset}.{self.bq_table}"
         rows_to_insert = [
             {
+                "run_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 "audio_file": audio_file,
                 "expected_intent": expected_intent,
                 "transcript": transcript,
