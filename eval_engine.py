@@ -57,6 +57,17 @@ class EvaluationEngine:
         logger.info(f"Completed multimodal transcription: {response.text}")
         return response.text
 
+    def classify_intent(self, transcript):
+        """Classify transcript into determined intent."""
+        if not self.model:
+            raise ValueError("Model not initialized")
+            
+        logger.info(f"Classifying intent for transcript: {transcript}")
+        prompt = f"Given the user said '{transcript}', what is their exact TV command intent? Answer with a single concise phrase (e.g. 'Switch to Channel 1', 'Volume Up')."
+        response = self.model.generate_content(prompt)
+        logger.info(f"Determined intent: {response.text.strip()}")
+        return response.text.strip()
+
     def evaluate_utterance(self, audio_file, expected_intent):
         try:
             if not audio_file or audio_file == "invalid.wav":
@@ -65,15 +76,17 @@ class EvaluationEngine:
             logger.info("Triggering transcription flow...")
             transcript = self.transcribe_audio(audio_file)
             
+            determined_intent = self.classify_intent(transcript)
+            
             logger.info(f"Invoking EvalTask against expected intent: '{expected_intent}'")
             eval_task = EvalTask(
-                dataset={"response": [transcript], "reference": [expected_intent]},
+                dataset={"response": [determined_intent], "reference": [expected_intent]},
                 metrics=["exact_match", "bleu"],
                 experiment=None
             )
             eval_results = eval_task.evaluate()
             
-            self._report_to_bq(audio_file, expected_intent, transcript, eval_results)
+            self._report_to_bq(audio_file, expected_intent, transcript, determined_intent, eval_results)
             return eval_results
         except ValueError as e:
             logger.error(str(e))
@@ -82,20 +95,25 @@ class EvaluationEngine:
             logger.error(f"Failed to evaluate utterance: {e}")
             raise ValueError(f"Failed to evaluate utterance: {e}")
 
-    def _report_to_bq(self, audio_file, expected_intent, transcript, eval_results):
+    def _report_to_bq(self, audio_file, expected_intent, transcript, determined_intent, eval_results):
         if not self.bq_client:
             logger.warning("Skipping BQ write (Client missing).")
             return
             
         import datetime
         table_id = f"{self.project_id}.{self.bq_dataset}.{self.bq_table}"
+        
+        metrics_dict = getattr(eval_results, 'summary_metrics', {})
+        
         rows_to_insert = [
             {
                 "run_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 "audio_file": audio_file,
                 "expected_intent": expected_intent,
                 "transcript": transcript,
-                "eval_summary": str(eval_results.summary_metrics) if hasattr(eval_results, 'summary_metrics') else str(eval_results)
+                "determined_intent": determined_intent,
+                "exact_match_score": float(metrics_dict.get('exact_match/mean', 0.0)),
+                "bleu_score": float(metrics_dict.get('bleu/mean', 0.0))
             }
         ]
         

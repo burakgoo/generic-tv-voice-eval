@@ -16,6 +16,22 @@ else
     echo "Using configured bucket gs://$BUCKET"
 fi
 
+echo "Provisioning BigQuery pipeline dashboards..."
+bq mk -d --location=$REGION cymbal-tv-voice:eval_results || true
+cat << 'EOF' > bq_schema.json
+[
+  {"name": "run_timestamp", "type": "TIMESTAMP"},
+  {"name": "audio_file", "type": "STRING"},
+  {"name": "expected_intent", "type": "STRING"},
+  {"name": "transcript", "type": "STRING"},
+  {"name": "determined_intent", "type": "STRING"},
+  {"name": "exact_match_score", "type": "FLOAT"},
+  {"name": "bleu_score", "type": "FLOAT"}
+]
+EOF
+bq mk --table cymbal-tv-voice:eval_results.runs bq_schema.json || echo "table already exists"
+rm bq_schema.json
+
 echo "Uploading local datasets to GCS..."
 mkdir -p data # ensure it exists
 echo "Uploading golden evaluation dataset audio clips (*.wav) and mapping tables if they exist locally..."
