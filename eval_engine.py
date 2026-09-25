@@ -23,7 +23,7 @@ class EvaluationEngine:
         
         self.model_version = self.config.get('eval_model_version', 'gemini-3.8-flash')
         self.project_id = self.config.get('project_id', 'cymbal-tv-voice')
-        self.location = self.config.get('location', 'us-central1')
+        self.location = self.config.get('location', 'global')
         self.bq_dataset = self.config.get('bq_dataset', 'eval_results')
         self.bq_table = self.config.get('bq_table', 'runs')
         logger.info(f"Loaded config: project={self.project_id}, model={self.model_version}")
