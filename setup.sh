@@ -20,6 +20,16 @@ echo "Uploading local datasets to GCS..."
 mkdir -p data # ensure it exists
 gcloud storage cp -r data/ gs://$BUCKET/data/ || echo "Upload finished or skipped"
 
+echo "Bootstrapping GCP APIs and IAM roles..."
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com aiplatform.googleapis.com || true
+
+PROJECT_NUM=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+COMPUTE_SA="${PROJECT_NUM}-compute@developer.gserviceaccount.com"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$COMPUTE_SA" --role="roles/storage.objectViewer" || true
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$COMPUTE_SA" --role="roles/artifactregistry.writer" || true
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$COMPUTE_SA" --role="roles/aiplatform.user" || true
+
 echo "Deploying to Cloud Run Jobs..."
 if [ ! -f Dockerfile ]; then
     echo "FROM python:3.13-slim
