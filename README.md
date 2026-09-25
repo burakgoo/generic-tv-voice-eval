@@ -31,3 +31,13 @@ If you are deploying from source (`--source .`), ensure that your default Comput
 - `roles/artifactregistry.writer` (to push the built Docker container)
 
 This allows Cloud Build to function successfully in your isolated environment!
+
+## API Prerequisites
+Before deploying the framework, you must ensure that your Google Cloud Project has the following APIs enabled:
+- Cloud Run API (`run.googleapis.com`)
+- Cloud Build API (`cloudbuild.googleapis.com`)
+- Artifact Registry API (`artifactregistry.googleapis.com`)
+- Vertex AI API (`aiplatform.googleapis.com`) - *Crucial for the LLM evaluation logic to avoid runtime crashes!*
+
+You can enable these individually via the GCP Console or by running:
+`gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com aiplatform.googleapis.com`
