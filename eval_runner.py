@@ -23,23 +23,23 @@ def main():
         
     with open(dataset_path, "r") as f:
         reader = list(csv.DictReader(f))
-        valid_intents = list(set([row.get("expected_intent", "") for row in reader if row.get("expected_intent")]))
-        for row in reader:
-        reader = csv.DictReader(f)
-        for row in reader:
-            file_rel = row.get("audio_file", "") # e.g. data/sample_0.wav
-            if not file_rel:
-                continue
-                
-            file_uri = f"gs://{asset_bucket}/{file_rel}"
-            expected = row.get("expected_intent", "")
+        
+    valid_intents = list(set([row.get("expected_intent", "") for row in reader if row.get("expected_intent")]))
+    
+    for row in reader:
+        file_rel = row.get("audio_file", "") # e.g. data/sample_0.wav
+        if not file_rel:
+            continue
             
-            logger.info(f"Evaluating utterance from {file_uri} (Expected: {expected})...")
-            try:
-                results = engine.evaluate_utterance(file_uri, expected, valid_intents)
-                logger.info(f"Results for {file_rel}: {results}")
-            except Exception as e:
-                logger.error(f"Error during evaluation of {file_uri}: {e}")
+        file_uri = f"gs://{asset_bucket}/{file_rel}"
+        expected = row.get("expected_intent", "")
+        
+        logger.info(f"Evaluating utterance from {file_uri} (Expected: {expected})...")
+        try:
+            results = engine.evaluate_utterance(file_uri, expected, valid_intents)
+            logger.info(f"Results for {file_rel}: {results}")
+        except Exception as e:
+            logger.error(f"Error during evaluation of {file_uri}: {e}")
 
     logger.info("Batch Evaluation loop complete.")
 
