@@ -22,6 +22,9 @@ def main():
         return
         
     with open(dataset_path, "r") as f:
+        reader = list(csv.DictReader(f))
+        valid_intents = list(set([row.get("expected_intent", "") for row in reader if row.get("expected_intent")]))
+        for row in reader:
         reader = csv.DictReader(f)
         for row in reader:
             file_rel = row.get("audio_file", "") # e.g. data/sample_0.wav
@@ -33,7 +36,7 @@ def main():
             
             logger.info(f"Evaluating utterance from {file_uri} (Expected: {expected})...")
             try:
-                results = engine.evaluate_utterance(file_uri, expected)
+                results = engine.evaluate_utterance(file_uri, expected, valid_intents)
                 logger.info(f"Results for {file_rel}: {results}")
             except Exception as e:
                 logger.error(f"Error during evaluation of {file_uri}: {e}")

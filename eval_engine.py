@@ -58,24 +58,18 @@ class EvaluationEngine:
         logger.info(f"Completed multimodal transcription: {response.text}")
         return response.text
 
-    def classify_intent(self, transcript):
+    def classify_intent(self, transcript, valid_intents):
         """Classify transcript into determined intent."""
         if not self.model:
             raise ValueError("Model not initialized")
             
         logger.info(f"Classifying intent for transcript: {transcript}")
-        valid_intents = [
-            "Switch to Channel 1", "Volume Up", "Mute the TV", 
-            "Turn off TV", "Pause the movie", "Launch YouTube", 
-            "Play", "Open Netflix", "Play next episode", 
-            "Search for Action Movies"
-        ]
         prompt = f"Given the user heard '{transcript}', map this exactly to one of the following valid intents: {valid_intents}. Output ONLY the exact valid intent string with no other punctuation or words. If it matches none, output 'None'." 
         response = self.model.generate_content(prompt)
         logger.info(f"Determined intent: {response.text.strip()}")
         return response.text.strip()
 
-    def evaluate_utterance(self, audio_file, expected_intent):
+    def evaluate_utterance(self, audio_file, expected_intent, valid_intents=None):
         try:
             if not audio_file or audio_file == "invalid.wav":
                 raise ValueError("Failed to evaluate utterance: Audio file is invalid")
@@ -83,7 +77,7 @@ class EvaluationEngine:
             logger.info("Triggering transcription flow...")
             transcript = self.transcribe_audio(audio_file)
             
-            determined_intent = self.classify_intent(transcript)
+            determined_intent = self.classify_intent(transcript, valid_intents or [])
             
             logger.info(f"Invoking EvalTask against expected intent: '{expected_intent}'")
             eval_task = EvalTask(
