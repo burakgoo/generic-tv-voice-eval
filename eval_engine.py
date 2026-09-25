@@ -67,7 +67,7 @@ class EvaluationEngine:
             
             logger.info(f"Invoking EvalTask against expected intent: '{expected_intent}'")
             eval_task = EvalTask(
-                dataset=[{"instruction": transcript, "reference": expected_intent}],
+                dataset={"instruction": [transcript], "reference": [expected_intent]},
                 metrics=["exact_match", "bleu"],
                 experiment="tv-voice-eval"
             )
