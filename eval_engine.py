@@ -21,7 +21,7 @@ class EvaluationEngine:
         except Exception:
             self.config = {}
         
-        self.model_version = self.config.get('eval_model_version', 'gemini-1.5-flash-001')
+        self.model_version = self.config.get('eval_model_version', 'gemini-3.8-flash')
         self.project_id = self.config.get('project_id', 'cymbal-tv-voice')
         self.location = self.config.get('location', 'us-central1')
         self.bq_dataset = self.config.get('bq_dataset', 'eval_results')
