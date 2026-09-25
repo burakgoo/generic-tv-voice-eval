@@ -49,6 +49,7 @@ gcloud run jobs deploy tv-voice-eval-job \
   --source . \
   --region $REGION \
   --project $PROJECT_ID \
+  --set-env-vars="ASSET_BUCKET=$BUCKET" \
   --execute-now
 
 echo "Setup Complete!"
