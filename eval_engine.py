@@ -2,6 +2,7 @@ import yaml
 import logging
 import vertexai
 from vertexai.evaluation import EvalTask
+import os
 from google.cloud import bigquery
 from vertexai.generative_models import GenerativeModel, Part
 
@@ -108,6 +109,7 @@ class EvaluationEngine:
         rows_to_insert = [
             {
                 "run_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "execution_id": os.environ.get("CLOUD_RUN_EXECUTION", "local-run"),
                 "audio_file": audio_file,
                 "expected_intent": expected_intent,
                 "transcript": transcript,
