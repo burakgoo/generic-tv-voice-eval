@@ -1,0 +1,4 @@
+project_id: ""
+region: "us-central1"
+gcs_asset_bucket: ""
+eval_model_version: "gemini-3.8-flash"
