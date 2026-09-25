@@ -41,3 +41,4 @@ Before deploying the framework, you must ensure that your Google Cloud Project h
 
 You can enable these individually via the GCP Console or by running:
 `gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com aiplatform.googleapis.com`
+- `roles/aiplatform.user` (to invoke Vertex AI evaluation)
