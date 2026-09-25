@@ -24,3 +24,10 @@ To ensure high reproducibility and ease of deployment:
    ```
 
 For a visual breakdown of the architecture, please view `flowchart.md`.
+
+## IAM Prerequisites
+If you are deploying from source (`--source .`), ensure that your default Compute service account (`[PROJECT_NUMBER]-compute@developer.gserviceaccount.com`) has the following IAM roles:
+- `roles/storage.objectViewer` (to read the uploaded zipped source file)
+- `roles/artifactregistry.writer` (to push the built Docker container)
+
+This allows Cloud Build to function successfully in your isolated environment!
