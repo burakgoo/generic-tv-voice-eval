@@ -69,7 +69,7 @@ class EvaluationEngine:
             eval_task = EvalTask(
                 dataset={"instruction": [transcript], "reference": [expected_intent]},
                 metrics=["exact_match", "bleu"],
-                experiment="tv-voice-eval"
+                experiment=None
             )
             eval_results = eval_task.evaluate()
             
