@@ -1,5 +1,7 @@
 import argparse
 import logging
+import csv
+import os
 from eval_engine import EvaluationEngine
 
 logging.basicConfig(
@@ -9,22 +11,34 @@ logging.basicConfig(
 logger = logging.getLogger("eval_runner")
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate a TV Voice audio file.")
-    parser.add_argument("--audio_file", default="gs://cymbal-tv-voice-test-harness/dummy.wav", help="Path to the audio file")
-    parser.add_argument("--expected_intent", default="Switch to Channel 1", help="The expected canonical intent")
-    parser.add_argument("--config", default="config.yaml", help="Path to config file")
-    args = parser.parse_args()
-
-    logger.info(f"Initializing Evaluation Engine using config {args.config}...")
-    engine = EvaluationEngine(config_path=args.config)
+    logger.info("Initializing Evaluation Engine using config config.yaml...")
+    engine = EvaluationEngine(config_path="config.yaml")
     
-    logger.info(f"Evaluating utterance from {args.audio_file} (Expected: {args.expected_intent})...")
-    try:
-        results = engine.evaluate_utterance(args.audio_file, args.expected_intent)
-        logger.info("Evaluation complete.")
-        logger.info(f"Results: {results}")
-    except Exception as e:
-        logger.error(f"Error during evaluation: {e}")
+    dataset_path = "data/golden_dataset.csv"
+    asset_bucket = os.environ.get("ASSET_BUCKET", "cymbal-tv-voice-test-harness")
+    
+    if not os.path.exists(dataset_path):
+        logger.error(f"Cannot find {dataset_path} inside container.")
+        return
+        
+    with open(dataset_path, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            file_rel = row.get("audio_file", "") # e.g. data/sample_0.wav
+            if not file_rel:
+                continue
+                
+            file_uri = f"gs://{asset_bucket}/{file_rel}"
+            expected = row.get("expected_intent", "")
+            
+            logger.info(f"Evaluating utterance from {file_uri} (Expected: {expected})...")
+            try:
+                results = engine.evaluate_utterance(file_uri, expected)
+                logger.info(f"Results for {file_rel}: {results}")
+            except Exception as e:
+                logger.error(f"Error during evaluation of {file_uri}: {e}")
+
+    logger.info("Batch Evaluation loop complete.")
 
 if __name__ == '__main__':
     main()
